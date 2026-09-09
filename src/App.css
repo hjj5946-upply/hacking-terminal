@@ -1,0 +1,190 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: #000;
+}
+
+.terminal-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #041a08 0%, #000000 75%);
+  overflow: hidden;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* CRT 스캔라인 효과 */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 255, 100, 0.05) 0px,
+    rgba(0, 255, 100, 0.05) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: scanShift 6s linear infinite;
+  z-index: 3;
+}
+
+@keyframes scanShift {
+  from { background-position: 0 0; }
+  to { background-position: 0 100px; }
+}
+
+/* 화면 가장자리 어둡게 (CRT 비네트) */
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 180px 60px rgba(0, 0, 0, 0.85);
+  z-index: 4;
+}
+
+.terminal {
+  position: relative;
+  width: min(90vw, 720px);
+  height: min(70vh, 520px);
+  background: rgba(4, 10, 6, 0.9);
+  border: 1px solid rgba(0, 255, 120, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 0 40px rgba(0, 255, 120, 0.25), inset 0 0 60px rgba(0, 255, 120, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.terminal-header {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #7bffb0;
+  border-bottom: 1px solid rgba(0, 255, 120, 0.25);
+  background: rgba(0, 255, 120, 0.04);
+  letter-spacing: 0.5px;
+}
+
+.terminal-body {
+  flex: 1;
+  padding: 14px 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.log-line {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #35ff8a;
+  text-shadow: 0 0 6px rgba(53, 255, 138, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.typing-line {
+  color: #baffd8;
+  text-shadow: 0 0 10px rgba(186, 255, 216, 0.8);
+}
+
+.cursor {
+  display: inline-block;
+  animation: blink 0.9s steps(1) infinite;
+  color: #baffd8;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0, 255, 120, 0.25);
+}
+
+.progress-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 255, 120, 0.1);
+  border: 1px solid rgba(0, 255, 120, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0f6, #35ff8a);
+  box-shadow: 0 0 10px rgba(53, 255, 138, 0.8);
+  transition: width 0.15s linear;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: #7bffb0;
+  min-width: 38px;
+  text-align: right;
+}
+
+.granted-banner {
+  margin-top: auto;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #7bffb0;
+  text-shadow: 0 0 20px rgba(53, 255, 138, 0.9);
+}
+
+/* ACCESS GRANTED 순간 글리치 연출 */
+.terminal.glitch {
+  animation: glitchShake 0.35s steps(2, end) 4;
+}
+
+.terminal.glitch::before,
+.terminal.glitch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.terminal.glitch::before {
+  background: rgba(255, 0, 60, 0.08);
+  transform: translateX(2px);
+  animation: glitchShift 0.4s infinite;
+}
+
+.terminal.glitch::after {
+  background: rgba(0, 120, 255, 0.08);
+  transform: translateX(-2px);
+  animation: glitchShift 0.4s infinite reverse;
+}
+
+@keyframes glitchShake {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes glitchShift {
+  0% { transform: translateX(2px); }
+  50% { transform: translateX(-2px); }
+  100% { transform: translateX(2px); }
+}
