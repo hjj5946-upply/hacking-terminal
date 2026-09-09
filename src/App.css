@@ -2,189 +2,272 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
-  background: #000;
+  background: #0a0a0c;
 }
 
-.terminal-wrapper {
-  position: relative;
+/* ------------------------------------------------------------------
+   바탕화면: F11 전체화면 기준으로 2x2 콘솔 창이 화면을 가득 채움
+------------------------------------------------------------------ */
+.desktop {
   width: 100vw;
   height: 100vh;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  background: #0a0a0c;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------
+   창틀: 윈도우 기본 창 색(라이트 크롬). 그림자 없음.
+------------------------------------------------------------------ */
+.win {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid #6f6f6f;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.win-active {
+  border-color: #4a4a4a;
+}
+
+.win-title {
+  flex: 0 0 auto;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0 0 10px;
+  background: #f3f3f3;
+  border-bottom: 1px solid #d6d6d6;
+  color: #6d6d6d;
+  font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+  font-size: 12px;
+  user-select: none;
+}
+
+.win-active .win-title {
+  background: #ffffff;
+  color: #1b1b1b;
+}
+
+.win-icon {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 10px;
+  line-height: 1;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at center, #041a08 0%, #000000 75%);
-  overflow: hidden;
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  border-radius: 2px;
+  background: #d9d9d9;
+  color: #3c3c3c;
 }
 
-/* CRT 스캔라인 효과 */
-.scanlines {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0, 255, 100, 0.05) 0px,
-    rgba(0, 255, 100, 0.05) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-  animation: scanShift 6s linear infinite;
-  z-index: 3;
-}
-
-@keyframes scanShift {
-  from { background-position: 0 0; }
-  to { background-position: 0 100px; }
-}
-
-/* 화면 가장자리 어둡게 (CRT 비네트) */
-.vignette {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  box-shadow: inset 0 0 180px 60px rgba(0, 0, 0, 0.85);
-  z-index: 4;
-}
-
-.terminal {
-  position: relative;
-  width: min(90vw, 720px);
-  height: min(70vh, 520px);
-  background: rgba(4, 10, 6, 0.9);
-  border: 1px solid rgba(0, 255, 120, 0.35);
-  border-radius: 8px;
-  box-shadow: 0 0 40px rgba(0, 255, 120, 0.25), inset 0 0 60px rgba(0, 255, 120, 0.06);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 2;
-}
-
-.terminal-header {
-  padding: 10px 16px;
-  font-size: 13px;
-  color: #7bffb0;
-  border-bottom: 1px solid rgba(0, 255, 120, 0.25);
-  background: rgba(0, 255, 120, 0.04);
-  letter-spacing: 0.5px;
-}
-
-.terminal-body {
+.win-caption {
   flex: 1;
-  padding: 14px 16px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
-.log-line {
-  font-size: 14px;
-  line-height: 1.5;
-  color: #35ff8a;
-  text-shadow: 0 0 6px rgba(53, 255, 138, 0.6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.typing-line {
-  color: #baffd8;
-  text-shadow: 0 0 10px rgba(186, 255, 216, 0.8);
+.win-buttons {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
 }
 
-.cursor {
-  display: inline-block;
-  animation: blink 0.9s steps(1) infinite;
-  color: #baffd8;
+.win-btn {
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 10px;
+  color: #4a4a4a;
+}
+
+.win-min {
+  font-size: 8px;
+}
+
+.win-close {
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------------
+   콘솔 내부 — 창마다 배경/글자색이 다름 (테마별 토큰)
+------------------------------------------------------------------ */
+.win-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 6px 8px 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.34;
+  white-space: pre;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb) var(--bg);
+}
+
+/* 윈도우 콘솔 스크롤바 느낌 */
+.win-body::-webkit-scrollbar {
+  width: 12px;
+}
+.win-body::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+.win-body::-webkit-scrollbar-thumb {
+  background: var(--sb);
+  border: 3px solid var(--bg);
+  border-radius: 6px;
+}
+
+.ln {
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+/* 공통 로그 색 역할 */
+.ln.dim {
+  color: var(--dim);
+}
+.ln.hdr {
+  color: var(--hdr);
+}
+.ln.warn {
+  color: var(--warn);
+}
+.ln.err {
+  color: var(--err);
+}
+.ln.ok {
+  color: var(--ok);
+}
+.ln.info {
+  color: var(--info);
+}
+.ln.accent {
+  color: var(--accent);
+}
+.ln.cmd {
+  color: var(--cmd);
+}
+
+.caret {
+  color: var(--fg);
+  animation: blink 1s steps(1) infinite;
 }
 
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
-.progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-top: 1px solid rgba(0, 255, 120, 0.25);
+/* 1) Windows PowerShell — 파란 배경 / 밝은 회색 글자 */
+.theme-ps {
+  --bg: #012456;
+  --fg: #eeedf0;
+  --dim: #9aa8c4;
+  --hdr: #ffffff;
+  --warn: #f9f1a5;
+  --err: #ff9a95;
+  --ok: #9be8b4;
+  --info: #b4d9ff;
+  --accent: #61d6d6;
+  --cmd: #ffffff;
+  --sb: #4a6690;
 }
 
-.progress-track {
-  flex: 1;
-  height: 8px;
-  background: rgba(0, 255, 120, 0.1);
-  border: 1px solid rgba(0, 255, 120, 0.3);
-  border-radius: 4px;
-  overflow: hidden;
+/* 2) cmd.exe — 검정 배경 / 클래식 실버 글자 */
+.theme-cmd {
+  --bg: #000000;
+  --fg: #cccccc;
+  --dim: #767676;
+  --hdr: #f2f2f2;
+  --warn: #c19c00;
+  --err: #e74856;
+  --ok: #16c60c;
+  --info: #3b78ff;
+  --accent: #61d6d6;
+  --cmd: #f2f2f2;
+  --sb: #3f3f3f;
 }
 
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #0f6, #35ff8a);
-  box-shadow: 0 0 10px rgba(53, 255, 138, 0.8);
-  transition: width 0.15s linear;
+/* 3) bash — 기존 초록 톤 유지 (#35ff8a 계열) */
+.theme-bash {
+  --bg: #0b100d;
+  --fg: #35ff8a;
+  --dim: #2f8f5c;
+  --hdr: #baffd8;
+  --warn: #ffd166;
+  --err: #ff6b5f;
+  --ok: #6effae;
+  --info: #baffd8;
+  --accent: #d9fff0;
+  --cmd: #eafff0;
+  --sb: #1d4d34;
 }
 
-.progress-label {
-  font-size: 12px;
-  color: #7bffb0;
-  min-width: 38px;
-  text-align: right;
+.theme-bash .ln {
+  text-shadow: 0 0 4px rgba(53, 255, 138, 0.25);
 }
 
-.granted-banner {
-  margin-top: auto;
-  text-align: center;
-  font-size: 32px;
+/* ACCESS GRANTED — 터미널 반전 블록처럼 */
+.ln.granted {
+  display: inline-block;
+  background: #35ff8a;
+  color: #04140a;
   font-weight: 700;
-  letter-spacing: 4px;
-  color: #7bffb0;
-  text-shadow: 0 0 20px rgba(53, 255, 138, 0.9);
+  letter-spacing: 2px;
+  text-shadow: none;
+  animation: grantFlash 0.16s steps(1) 6;
 }
 
-/* ACCESS GRANTED 순간 글리치 연출 */
-.terminal.glitch {
-  animation: glitchShake 0.35s steps(2, end) 4;
+@keyframes grantFlash {
+  50% {
+    background: #04140a;
+    color: #35ff8a;
+  }
 }
 
-.terminal.glitch::before,
-.terminal.glitch::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: screen;
+/* 4) 무한 로딩 로그 — 다크 그레이 배경 / 옅은 회색 글자 */
+.theme-loader {
+  --bg: #1e1e1e;
+  --fg: #d4d4d4;
+  --dim: #808080;
+  --hdr: #e8e8e8;
+  --warn: #dcdcaa;
+  --err: #f14c4c;
+  --ok: #4ec9b0;
+  --info: #9cdcfe;
+  --accent: #c586c0;
+  --cmd: #ffffff;
+  --sb: #424242;
 }
 
-.terminal.glitch::before {
-  background: rgba(255, 0, 60, 0.08);
-  transform: translateX(2px);
-  animation: glitchShift 0.4s infinite;
-}
-
-.terminal.glitch::after {
-  background: rgba(0, 120, 255, 0.08);
-  transform: translateX(-2px);
-  animation: glitchShift 0.4s infinite reverse;
-}
-
-@keyframes glitchShake {
-  0% { transform: translate(0, 0); }
-  25% { transform: translate(-2px, 1px); }
-  50% { transform: translate(2px, -1px); }
-  75% { transform: translate(-1px, -1px); }
-  100% { transform: translate(0, 0); }
-}
-
-@keyframes glitchShift {
-  0% { transform: translateX(2px); }
-  50% { transform: translateX(-2px); }
-  100% { transform: translateX(2px); }
+/* 화면이 작을 때는 2x2 유지가 어려우니 가로 1열로 */
+@media (max-width: 900px) {
+  .desktop {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 1fr);
+  }
 }
